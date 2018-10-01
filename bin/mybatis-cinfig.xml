@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE configuration PUBLIC "-//mybatis.org//DTD Config 3.0//EN" 
+	"http://mybatis.org/dtd/mybatis-3-config.dtd"> 
+	<configuration> 
+		 <typeAliases> 
+			 <!-- <typeAlias alias="Student" type="com.briup.bean.Student" />  -->
+		<!--  自动给当前包下所有的javabean提供一个别名 默认：类名 大小写不区分  -->
+			<package name="com.briup.bean"/> 
+			<package name="com.briup.one2m"/>
+			<package name="com.briup.m2m"/>
+			<package name="com.briup.specail"/>
+		</typeAliases>
+		<typeHandlers>
+		<typeHandler handler="com.briup.handler.AddHandler"/>
+		</typeHandlers>
+		<!-- 数据库开发环境 -->
+		<environments default="development"> 
+		
+		<environment id="development"> 
+		<!-- 事务管理器 -->
+		<transactionManager type="JDBC" /> 
+		<!-- 数据源数据库连接信息 -->
+		<dataSource type="POOLED">
+		<!--
+		<property name="driver" value="com.mysql.jdbc.Driver" /> 
+		<property name="url" value="jdbc:mysql://localhost:3306/test" /> 
+		-->
+		<!-- 配置参数 key value -->
+			<property name="driver" value="oracle.jdbc.driver.OracleDriver" /> 
+			<property name="url" value="jdbc:oracle:thin:@127.0.0.1:1521:XE" /> 
+			<property name="username" value="briup" /> 
+			<property name="password" value="briup" /> 
+		</dataSource> 
+		</environment> 
+		</environments> 
+		<mappers> 
+			<mapper resource="com/briup/bean/StudentMapper.xml" /> 
+			<mapper resource="com/briup/bean/CustomerMapper.xml"/>
+			<mapper resource="com/briup/bean/One2OneMapper.xml"/>
+			<mapper resource="com/briup/one2m/One2MMapper.xml"/>
+			<mapper resource="com/briup/m2m/M2MMapper.xml"/>
+			<mapper resource="com/briup/special/SpecialMapper.xml"/>
+		</mappers> 
+	</configuration> 

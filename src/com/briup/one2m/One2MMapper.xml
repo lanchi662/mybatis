@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+	1.namespace 不能重复
+	2.如果映射文件有对应的映射接口，
+		那么映射接口的全类名必须和namespace一致
+--> 
+<mapper namespace="com.briup.dao.IOne2MMapper">
+	<insert id="saveGroup" parameterType="group">
+	  <selectKey order="BEFORE" resultType="int" keyProperty="id">
+	  	select t_group_seq.nextval from dual
+	  </selectKey>
+	  insert into t_group(id,name) values(#{id},#{name})
+	</insert>
+	<insert id="saveUser" parameterType="user">
+		<selectKey order="BEFORE" resultType="int" keyProperty="id">
+		select t_user_seq.nextval from dual
+		</selectKey>
+	insert into t_user(id,name,age,email,phone,group_id) values(#{id},#{name},#{age},#{email},#{phone},#{group.id})
+	</insert>
+	<!-- 1.1查询用groupid查user 嵌套结果集 -->  
+	<select id="selectganduById" resultMap="userResultmap">
+		select g.id gid,g.name gname,tu.id tuid,tu.name uname,age,email,phone
+		   from t_group g,t_user tu
+		     where g.id=group_id
+		      and g.id=#{id}
+	</select>									
+	<resultMap type="group" id="userResultmap">
+	<id column="gid" property="id"/>
+	<result column="gname" property="name"/>
+	<collection property="users" ofType="user">
+		<id column="tuid" property="id"/>
+		<result column="uname" property="name"/>
+		<result column="age" property="age"/>
+		<result column="email" property="email"/>
+		<result column="phone" property="phone"/>
+	</collection>
+	</resultMap>
+	<!--1.2 查询groupid 查user嵌套子查询 -->
+	<select id="selectqanduById2" resultMap="userResultmap2">
+	select id,name from t_group where id=#{id}
+	</select>
+	<resultMap type="group" id="userResultmap2">
+	<id column="id" property="id"/>
+	<collection property="users" column="id" select="selectuser"></collection>
+	</resultMap>
+	<select id="selectuser" resultType="user">
+	select id,name,age,email,phone from t_user where group_id=#{id}
+	</select>
+	<!-- 2.1根据userid查询group -->
+	<select id="selectuandgById" resultMap="groupResultmap">
+	select tu.id tuid,tu.name tuname,age,email,phone,g.id gid,g.name gname
+	  from t_group g,t_user tu
+	    where group_id=g.id
+	      and group_id=#{id}
+	</select>
+	<resultMap type="user" id="groupResultmap">
+		<id column="tuid" property="id"/>
+		<result column="tuname" property="name"/>
+		<result column="age" property="age"/>
+		<result column="email" property="email"/>
+		<result column="phone" property="phone"/>
+		<association property="group" column="group_id" resultMap="groupResultmap21"></association>
+	</resultMap>
+	<resultMap type="group" id="groupResultmap21">
+	<id column="gid" property="id"/>
+	<result column="gname" property="name"/>
+	</resultMap>
+	<!-- 2.2根据userid查询group -->
+	<select id="selectuandgById2" resultMap="groupResultmap2">
+	select id,name,age,email,phone,group_id from t_user where id=#{id}
+	</select>
+	<resultMap type="user" id="groupResultmap2">
+	<!-- <result column="group_id" property="group.id"/>  -->
+	<association property="group" column="group_id" select="selectgroupid2"></association>
+	</resultMap>
+	<select id="selectgroupid2" resultType="group">
+	select id,name from t_group where id=#{id}
+	</select>
+</mapper> 

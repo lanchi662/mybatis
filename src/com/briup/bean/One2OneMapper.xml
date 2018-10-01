@@ -1,0 +1,85 @@
+<?xml version="1.0" encoding="utf-8"?> 
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+	1.namespace 不能重复
+	2.如果映射文件有对应的映射接口，
+		那么映射接口的全类名必须和namespace一致
+--> 
+<mapper namespace="com.briup.dao.IOne2OneMapper">  
+ 	<!-- 使用sequence序列 -->
+ 	<insert id="saveWife" parameterType="wife">
+ 		<selectKey order="BEFORE" resultType="int" keyProperty="id">
+ 			select wife_seq.nextval from dual
+ 		</selectKey>
+ 		insert into wife(wid,name)   
+ 		  values(#{id},#{name})
+ 	</insert>
+ 	<insert id="saveHus" parameterType="hus">
+ 		<selectKey order="BEFORE" resultType="int" keyProperty="id">
+ 			select hus_seq.nextval from dual
+ 		</selectKey>
+ 		insert into husband(hid,name,wife_id)   
+ 		  values(#{id},#{name},#{wife.id})
+ 	</insert>
+ 	<!--映射结果集  -->
+ 	<!-- 查询wife -->
+ 	<resultMap type="wife" id="WifeResultMap">
+ 		<id column="wid" property="id"/>
+ 		<!-- 如果列名和属性名一样可以忽略不写 -->
+ 		<result column="name" property="name"/>
+ 	</resultMap>
+ 	<select id="selectWifeById" resultMap="WifeResultMap">
+ 		select wid ,name from wife where wid=#{id}
+ 	</select>
+ 	<!-- 查询husband不包含wife -->
+ 	<resultMap type="hus" id="husResultMap">
+ 		<id column="hid" property="id"/>
+ 	</resultMap>
+ 	<select id="selectHusId" resultMap="husResultMap">
+ 		select hid,name,wife_id 
+ 		 from husband 
+ 		  where hid = #{id}
+ 	</select>
+ 	<!-- 1.1查询husband包含wife -->
+ 	<select id="selectHusandWifeId" resultMap="husResultandwife">
+ 		select hid,h.name hname,w.name wname,wid
+ 		  from husband h,wife w
+ 		    where h.wife_id=w.wid
+ 		      and hid=#{id}
+ 	</select>
+ 	<resultMap type="hus" id="husResultandwife">
+ 		<id column="hid" property="id"/>
+ 		<id column="wid" property="id"/>
+ 		<result column="hname" property="name"/>
+ 		<result column="wname" property="wife.name"/>		
+ 	</resultMap>
+ 	<!-- 1.2查询husband包含wife -->
+ 	<select id="selectHusandWifeId12" resultMap="husResultandwife12">
+ 		select hid,h.name hname,w.name wname,wid
+ 		  from husband h,wife w
+ 		    where h.wife_id=w.wid
+ 		      and hid=#{id}
+ 	</select>
+ 	<resultMap type="hus" id="husResultandwife12">
+ 		<id column="hid" property="id"/>
+ 		<result column="hname" property="name"/>
+ 		<result column="wife_id" property="wife.id"/>
+ 		<association property="wife" resultMap="husResultandwife122"></association>
+ 	</resultMap>
+ 	<resultMap type="wife" id="husResultandwife122">
+ 		<id column="wid" property="id"/>
+ 		<result column="wname" property="name"/>
+ 	</resultMap>
+ 	<!-- 2.查询husband包含wife嵌套子查询 -->
+ 	<select id="selectHusandWifeId2" resultMap="husResultandwife2">
+ 		select hid,name,wife_id from husband
+ 		  where hid=#{id}
+ 	</select>
+ 	<resultMap type="hus" id="husResultandwife2">
+ 	<id column="hid" property="id"/>
+ 	<result column="wife_id" property="wife.id"/>
+ 	<association property="wife" column="wife_id" select="selectWifeById"></association>
+ 	</resultMap>
+
+</mapper> 

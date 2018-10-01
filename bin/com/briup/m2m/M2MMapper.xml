@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+				"http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<!-- 
+	1.namespace 不能重复
+	2.如果映射文件有对应的映射接口，
+		那么映射接口的全类名必须和namespace一致
+--> 
+<mapper namespace="com.briup.dao.IM2MMapper">
+	<!-- 查询1号学生的所有老师 -->
+	<select id="selectstuteaId" resultMap="teaResultmap">
+	select t.id tid,name,age,phone
+	  from teacher t,stu_tea st
+	    where tea_id=t.id and stu_id=#{id}
+	</select>
+	<resultMap type="teacher" id="teaResultmap">
+	<id column="tid" property="id"/>
+	<result column="name" property="name"/>
+	<result column="age" property="age"/>
+	<result column="phone" property="phone"/>
+	</resultMap>
+	<!-- 查询1号老师的所有学生 -->
+	<select id="selectteastuId" resultMap="stuResultmap">
+	select s.id sid,name,age,phone
+	  from student s,stu_tea st
+	    where stu_id=s.id and tea_id=#{id}
+	</select>
+	<resultMap type="stu" id="stuResultmap">
+	<id column="sid" property="id"/>
+	<result column="name" property="name"/>
+	<result column="age" property="age"/>
+	<result column="phone" property="phone"/>
+	</resultMap>
+	<!-- 查询学生信息包含老师信息 嵌套子查询-->
+	<select id="selectstuandtea" resultMap="studentResultmap">
+	select id,name,age,phone from student
+	</select>
+	<resultMap type="stu" id="studentResultmap">
+	<id column="id" property="id"/>
+	<result column="name" property="name"/>
+	<result column="age" property="age"/>
+	<result column="phone" property="phone"/>
+	<collection property="teachers" column="id" select="selectstuteaId"></collection>
+	</resultMap>
+	<!-- 查询老师信息包含学生信息嵌套子查询 -->
+	<select id="selectteaandstu" resultMap="teadentResultmap">
+	select id,name,age,phone from teacher
+	</select>
+	<resultMap type="teacher" id="teadentResultmap">
+	<id column="id" property="id"/>
+	<result column="name" property="name"/>
+	<result column="age" property="age"/>
+	<result column="phone" property="phone"/>
+	<collection property="students" column="id" select="selectteastuId"></collection>
+	</resultMap>
+	<!-- 嵌套结果集查询老师信息包含学生信息 -->
+	<select id="select" resultMap="selectResultmap">
+	select s.id sid,s.name sname,s.age sage,s.phone sphone,t.id tid,t.name tname,t.age tage,t.phone tphone
+	  from student s,teacher t,stu_tea st
+	    where t.id=tea_id and s.id=stu_id
+	</select>
+	<resultMap type="teacher" id="selectResultmap">
+	<id column="tid" property="id"/>
+	<result column="tname" property="name"/>
+	<result column="tage" property="age"/>
+	<result column="tphone" property="phone"/>
+	<collection property="students" ofType="stu">
+	<id column="sid" property="id"/>
+	<result column="sname" property="name"/>
+	<result column="sage" property="age"/>
+	<result column="sphone" property="phone"/>
+	</collection>
+	</resultMap>
+	
+	
+	
+	
+	
+</mapper>

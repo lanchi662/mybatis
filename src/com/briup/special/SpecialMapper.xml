@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" 
+			"http://mybatis.org/dtd/mybatis-3-mapper.dtd"> 
+<!-- 1.namespace不能重复
+	 2.如果有映射 那么映射接口的全类名必须和namespace一致 -->
+	<mapper namespace="com.briup.dao.ISpecialMapper"> 
+	<insert id="saveUser1">
+	insert into t_user1(id,name,gender) values(#{id},#{name},#{gender})
+	</insert>
+	</mapper>
